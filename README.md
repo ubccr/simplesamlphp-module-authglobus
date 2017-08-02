@@ -1,0 +1,1 @@
+# SimpleSAMLphp Globus Auth Module
