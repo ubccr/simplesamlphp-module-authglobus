@@ -1,0 +1,34 @@
+# Use container-based environment for quicker initialization
+sudo: false
+
+# Since we still support CentOS 6 we need to be able to test 5.3.3
+dist: precise
+
+# Specify the build matrix
+language: php
+php:
+    - '5.3.3'
+    - '5.4'
+    - '7.0'
+    - '7.1.6'
+env:
+    matrix:
+        - TEST_SUITE=syntax
+        - TEST_SUITE=style
+matrix:
+    exclude:
+        - php: '5.4'
+          env: TEST_SUITE=style
+        - php: '7.0'
+          env: TEST_SUITE=style
+        - php: '7.1.6'
+          env: TEST_SUITE=style
+
+# Add dependency directories to the Travis cache
+cache:
+    directories:
+        - $HOME/.composer/cache
+# Delegate the installation step to the custom Travis installation script
+install: ./.travis.install.sh
+# Delegate the build step to the custom Travis build script
+script: ./.travis.build.sh
