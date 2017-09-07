@@ -1,0 +1,21 @@
+{
+    "name": "ubccr/simplesamlphp-module-authglobus",
+    "description": "Globus Auth module for SimpleSAMLphp.",
+    "version": "1.0.0",
+    "type": "simplesamlphp-module",
+    "license": "GPL-3.0",
+    "authors": [
+        {
+            "name": "Rudra Chakraborty",
+            "email": "rudracha@buffalo.edu",
+            "role": "Scientific Programmer, University at Buffalo"
+        }
+    ],
+    "require": {
+        "simplesamlphp/composer-module-installer": "~1.0"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "2.8.0",
+        "simplesamlphp/simplesamlphp": "^1.14"
+    }
+}

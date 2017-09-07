@@ -5,6 +5,7 @@
       <exclude name="PSR1.Files.SideEffects.FoundWithSymbols" />
   </rule>
   <rule ref="PSR2">
+      <exclude name="PSR1.Classes.ClassDeclaration.MissingNamespace"/>
       <exclude name="PSR2.Methods.FunctionCallSignature.SpaceBeforeCloseBracket" />
       <exclude name="PSR2.Methods.FunctionClosingBrace.SpacingBeforeClose" />
       <exclude name="PSR2.Classes.PropertyDeclaration.Underscore" />
