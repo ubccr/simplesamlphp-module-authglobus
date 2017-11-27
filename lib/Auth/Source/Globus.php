@@ -53,11 +53,10 @@ class sspmod_authglobus_Auth_Source_Globus extends SimpleSAML_Auth_Source
         $this->redirect_uri= $config['redirect_uri'];
         $this->curl = curl_init();
         curl_setopt($this->curl, CURLOPT_USERAGENT, 'SSPHP Globus');
-        curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($this->curl, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($this->curl, CURLOPT_SSL_VERIFYHOST, true);
-        curl_setopt($this->curl, CURLOPT_SSL_VERIFYPEER, true);
+        curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($this->curl, CURLOPT_SSL_VERIFYHOST, 2);
+        curl_setopt($this->curl, CURLOPT_SSL_VERIFYPEER, 2);
         curl_setopt($this->curl, CURLINFO_HEADER_OUT, true);
     }
 
