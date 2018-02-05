@@ -45,7 +45,7 @@ class sspmod_authglobus_Auth_Source_Globus extends SimpleSAML_Auth_Source
     public function __construct($info, $config) {
         // Call the parent constructor first, as required by the interface
         parent::__construct($info, $config);
-        
+
         $this->key = $config['key'];
         $this->secret = $config['secret'];
         $this->scope = $config['scope'];
@@ -61,21 +61,21 @@ class sspmod_authglobus_Auth_Source_Globus extends SimpleSAML_Auth_Source
     }
 
     /**
-     * Flattens an associative array, derived from LinkedIn module's flatten
+     * SAMLize an associative array, derived from LinkedIn module's flatten
      *
      * @param array $array
      * @param string $prefix
      *
      * @return array the array with the new concatenated keys
      */
-    protected function flatten($array, $prefix = '') {
+    protected function samlize($array, $prefix = '') {
         $newArr = array();
 
         foreach ($array as $key => $value) {
             if (is_array($value)) {
-                $newArr = $newArr + $this->flatten($value, $prefix . $key . '.');
+                $newArr = $newArr + $this->samlize($value, $prefix . $key . '.');
             } else {
-                $newArr[$prefix . $key] = $value;
+                $newArr[$prefix . $key] = array($value);
             }
         }
 
@@ -145,7 +145,7 @@ class sspmod_authglobus_Auth_Source_Globus extends SimpleSAML_Auth_Source
         } else {
             curl_setopt($this->curl, CURLOPT_USERPWD, null);
         }
-        
+
         $endPoint = self::API_ENDPT . $path . (($qs !== null) ? $qs : '');
         curl_setopt($this->curl, CURLOPT_URL, $endPoint);
 
@@ -231,25 +231,9 @@ class sspmod_authglobus_Auth_Source_Globus extends SimpleSAML_Auth_Source
 
         // Exchange the code we got earlier for an access token
         $result = $this->doCurlRequest('/oauth2/token', true, null, null, $request, 'POST');
-        $otherTokens = $result->other_tokens;
 
         // Use this access token to tell us about our current user + affiliations
         $userInfo = $this->doCurlRequest('/oauth2/userinfo', false, $result->access_token);
-
-        // Get any other identities we may have
-        $otherIdentities = array();
-
-        if (isset($otherTokens)) {
-            foreach ($otherTokens as &$item) {
-                $res = $this->doCurlRequest('/api/identities/', false, $item->access_token, $userInfo['sub']);
-
-                foreach ($res as &$id) {
-                    array_push($otherIdentities, $id);
-                }
-            }
-        }
-
-        $otherIdentities = $this->flatten($otherIdentities, 'identity.');
         $fullname = $this->getFullName($userInfo['name']);
 
         $attributes = array(
@@ -261,10 +245,8 @@ class sspmod_authglobus_Auth_Source_Globus extends SimpleSAML_Auth_Source
             'name' => array($userInfo['name']),
             'first_name' => array($fullname['first_name']),
             'last_name' => array($fullname['last_name']),
-            'organization' => array($userInfo['organization']),
-            'identities' => $otherIdentities
+            'organization' => array($userInfo['organization'])
         );
-
-        $state['Attributes'] = $attributes;
+        $state['Attributes'] = array_merge($attributes, $this->samlize($userInfo['identity_set'], 'identity.'));
     }
 }
