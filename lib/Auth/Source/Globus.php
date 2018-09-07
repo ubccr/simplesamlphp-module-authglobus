@@ -1,14 +1,14 @@
 <?php
 
-require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/oauth/lib/Consumer.php');
-require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/oauth/libextinc/OAuth.php');
+require_once dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/oauth/lib/Consumer.php';
+require_once dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/oauth/libextinc/OAuth.php';
 
 /**
  * Authenticate using the Globus Platform Auth Protocol
  * Documentation: https://docs.globus.org/api/auth/developer-guide
  * Globus Website: https://www.globus.org/
  *
- * @author Rudra Chakraborty, Center for Computational Research - University at Buffalo. rudracha@buffalo.edu
+ * @author  Rudra Chakraborty, Center for Computational Research - University at Buffalo. rudracha@buffalo.edu
  * @package SimpleSAMLphp
  */
 
@@ -39,10 +39,11 @@ class sspmod_authglobus_Auth_Source_Globus extends SimpleSAML_Auth_Source
     /**
      * Constructor for this authentication source.
      *
-     * @param array $info  Information about this authentication source.
-     * @param array $config  Configuration.
+     * @param array $info   Information about this authentication source.
+     * @param array $config Configuration.
      */
-    public function __construct($info, $config) {
+    public function __construct($info, $config)
+    {
         // Call the parent constructor first, as required by the interface
         parent::__construct($info, $config);
 
@@ -68,7 +69,8 @@ class sspmod_authglobus_Auth_Source_Globus extends SimpleSAML_Auth_Source
      *
      * @return array the array with the new concatenated keys
      */
-    protected function samlize($array, $prefix = '') {
+    protected function samlize($array, $prefix = '')
+    {
         $newArr = array();
 
         foreach ($array as $key => $value) {
@@ -83,55 +85,44 @@ class sspmod_authglobus_Auth_Source_Globus extends SimpleSAML_Auth_Source
     }
 
     /**
-    * Accepts a field containing a full name, attempts to extract a full name
-    *
-    * @param string $name
-    *
-    * @return an array containing first name and last name
-    */
-    protected function getFullName($name) {
+     * Accepts a field containing a full name, attempts to extract a full name
+     *
+     * @param string $name
+     *
+     * @return an array containing first name and last name
+     */
+    protected function getFullName($name)
+    {
         $trimmedName = trim($name);
-
-        if ($trimmedName && (strpos($trimmedName, ',') !== null || strpos($trimmedName, '\s') !== null)) {
-            $delimiter = strpos($name, ',') !== null ? ',' : '\s';
-            $nameParts = explode($delimiter, $trimmedName, 2);
-            $nameParts = array_map('trim', $nameParts);
-
-            $firstName;
-            $lastName;
-
-            if ($delimiter === '\s') {
-                $firstName = $nameParts[0];
-                $lastName = $nameParts[1];
-            } else {
-                $firstName = $nameParts[1];
-                $lastName = $nameParts[0];
-            }
-
-            return array(
-                'first_name' => $firstName,
-                'last_name' => $lastName
-            );
+        $lastName = 'UNKNOWN';
+        $firstName = 'UNKNOWN';
+    
+        // we mandate that a complete name be provided (not just a first name or last)
+        if(strpos($trimmedName, ',') !== false ) {
+            list($lastName, $firstName) = explode(',', $trimmedName, 2);
         }
-
+        elseif(strpos($trimmedName, ' ') !== false ) {
+            list($firstName, $lastName) = explode(' ', $trimmedName, 2);
+        }
+    
         return array(
-            'first_name' => 'UNKNOWN',
-            'last_name' => 'UNKNOWN'
+            'first_name' => trim($firstName),
+            'last_name' => trim($lastName)
         );
     }
 
     /**
-    * Wrapper for Curl Requests
-    *
-    * @param string path
-    * @param boolean signed
-    * @param string token
-    * @param string qs
-    * @param array contents
-    * @param string method
-    *
-    * @return The response from the endpoint where we made the request.
-    */
+     * Wrapper for Curl Requests
+     *
+     * @param string path
+     * @param boolean signed
+     * @param string token
+     * @param string qs
+     * @param array contents
+     * @param string method
+     *
+     * @return The response from the endpoint where we made the request.
+     */
     protected function doCurlRequest(
         $path,
         $signed = false,
@@ -188,7 +179,7 @@ class sspmod_authglobus_Auth_Source_Globus extends SimpleSAML_Auth_Source
     /**
      * Obtain an Authorization Code
      *
-     * @param array &$state  Information about the current authentication.
+     * @param array &$state Information about the current authentication.
      */
     public function authenticate(&$state)
     {
@@ -219,7 +210,7 @@ class sspmod_authglobus_Auth_Source_Globus extends SimpleSAML_Auth_Source
     /**
      * Exchange authorization code for an access token
      *
-     * @param array &$state  Information about the current authentication.
+     * @param array &$state Information about the current authentication.
      */
     public function finalStep(&$state)
     {
